@@ -1,5 +1,5 @@
 from colorama import *
-from indicator import *
+from function import *
 from orders import *
 from alert import *
 import datetime, time
