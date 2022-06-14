@@ -309,6 +309,11 @@ def main():
                 quantity["quantityBuy"] = 0
                 state = 'SELL'
                 valor_compra = float(order_buy["price"])
+                save_info({"state" : state,
+                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity},
+                            "resumen" : "on",
+                            "quick_order":"off",
+                            "valor_compra" : valor_compra},'action.json')
                 telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
                 save_info(order_buy,"ordenes.json")
                 save_info({"quick_order":"off"},'action.json')
@@ -329,6 +334,10 @@ def main():
                                 quantity["quantityBuy"] = 0
                                 state = 'SELL'
                                 valor_compra = float(order_buy["price"])
+                                save_info({"state" : state,
+                                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity},
+                                            "resumen" : "on",
+                                            "valor_compra" : valor_compra,},'action.json')
                                 telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
 
                                 save_info(order_buy, "ordenes.json")
@@ -346,6 +355,10 @@ def main():
                                 quantity["quantityBuy"] = 0
                                 state = 'SELL'
                                 valor_compra = float(order_buy["price"])
+                                save_info({"state" : state,
+                                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity},
+                                            "resumen" : "on",
+                                            "valor_compra" : valor_compra,},'action.json')
                                 telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
 
                                 save_info(order_buy,"ordenes.json")
@@ -367,7 +380,11 @@ def main():
                 state = 'BUY'
                 telegram_bot(f'🚀Vendimos \n😎{order_sell["symbolTicker"][:-3]} 💪*{round(((float(order_sell["price"])-valor_compra)*100)/valor_compra,2)}%*\n🔢Order ID : {order_sell["order_id"]}\n📉Operacion: {order_sell["side"]}\n🪙{order_sell["symbolTicker"][:-3]}: {order_sell["quantity"]}\n💵{order_sell["symbolTicker"][-3:]} : {float(order_sell["total"])}\n📊Precio: {order_sell["price"]}')
                 save_info(order_sell,'ordenes.json')
-                save_info({"quick_order":"off"},'action.json')
+                save_info({"state" : state,
+                            "quantity" : {"quantityBuy": quantity ,"quantitySell": 0.0},
+                            "resumen" : "on",
+                            "quick_order":"off",
+                            "valor_compra" : 0.0,},'action.json')
             try:
                 price = float(lastprice(symbolTicker))
             except Exception as e:
@@ -404,6 +421,10 @@ def main():
                 quantity["quantityBuy"] = round(float(order_sell["price"])*float(order_sell["quantity"]),2)
                 quantity["quantitySell"] = 0
                 state = 'BUY'
+                save_info({"state" : state,
+                            "quantity" : {"quantityBuy": quantity ,"quantitySell": 0.0},
+                            "resumen" : "on",
+                            "valor_compra" : 0.0,},'action.json')
                 telegram_bot(f'🚀Vendimos \n😎{order_sell["symbolTicker"][:-3]} 💪*{round(((float(order_sell["price"])-valor_compra)*100)/valor_compra,2)}%*\n🔢Order ID : {order_sell["order_id"]}\n📉Operacion: {order_sell["side"]}\n🪙{order_sell["symbolTicker"][:-3]}: {order_sell["quantity"]}\n💵{order_sell["symbolTicker"][-3:]} : {float(order_sell["total"])}\n📊Precio: {order_sell["price"]}')
                 save_info(order_sell,'ordenes.json')
 
