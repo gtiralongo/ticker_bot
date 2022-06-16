@@ -1,11 +1,14 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, CallbackContext
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup 
 from colorama import *
-from funcion import *
+from indicator import *
 from orders import *
-import datetime
+from alert import *
+import datetime, time
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup 
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, CallbackContext
 import logging
 import config
+from indicator import *
+import datetime
 import time
 
 init(autoreset=True)
@@ -258,6 +261,7 @@ def main():
         quantity = info_action['quantity']
         valor_compra =  info_action['valor_compra']
         porcent_up = info_action['porcent_up']
+        porcent_gan = porcent_up
         quick = info_action['quick_order']
         save_info({"time":datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")},'action.json')
         print("---------------------------------------")
@@ -310,7 +314,7 @@ def main():
                 state = 'SELL'
                 valor_compra = float(order_buy["price"])
                 save_info({"state" : state,
-                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity[["quantitySell"]]},
+                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity["quantitySell"]},
                             "resumen" : "on",
                             "quick_order":"off",
                             "valor_compra" : valor_compra},'action.json')
@@ -335,7 +339,7 @@ def main():
                                 state = 'SELL'
                                 valor_compra = float(order_buy["price"])
                                 save_info({"state" : state,
-                                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity[["quantitySell"]]},
+                                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity["quantitySell"]},
                                             "resumen" : "on",
                                             "valor_compra" : valor_compra,},'action.json')
                                 telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
@@ -356,7 +360,7 @@ def main():
                                 state = 'SELL'
                                 valor_compra = float(order_buy["price"])
                                 save_info({"state" : state,
-                                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity[["quantitySell"]]},
+                                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity["quantitySell"]},
                                             "resumen" : "on",
                                             "valor_compra" : valor_compra,},'action.json')
                                 telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
@@ -375,7 +379,7 @@ def main():
                     print(f'Sell order de {symbolTicker} estado {state}, el programa se detuvo Error: _{e}_')
                     time.sleep(2)
                     order_sell = dinamic_order_sell(symbolTicker,quantity,stop_sell)
-                quantity["quantityBuy"] = round(float(order_sell["price"])*float(order_sell["quantity"]),2)
+                quantity["quantityBuy"] = float(order_sell["price"])*float(order_sell["quantity"])
                 quantity["quantitySell"] = 0
                 state = 'BUY'
                 telegram_bot(f'🚀Vendimos \n😎{order_sell["symbolTicker"][:-3]} 💪*{round(((float(order_sell["price"])-valor_compra)*100)/valor_compra,2)}%*\n🔢Order ID : {order_sell["order_id"]}\n📉Operacion: {order_sell["side"]}\n🪙{order_sell["symbolTicker"][:-3]}: {order_sell["quantity"]}\n💵{order_sell["symbolTicker"][-3:]} : {float(order_sell["total"])}\n📊Precio: {order_sell["price"]}')
@@ -418,7 +422,7 @@ def main():
                     print(f'Sell order de {symbolTicker} estado {state}, el programa se detuvo Error: _{e}_')
                     time.sleep(2)
                     order_sell = dinamic_order_sell(symbolTicker,quantity,stop_sell)
-                quantity["quantityBuy"] = round(float(order_sell["price"])*float(order_sell["quantity"]),2)
+                quantity["quantityBuy"] = float(order_sell["price"])*float(order_sell["quantity"])
                 quantity["quantitySell"] = 0
                 state = 'BUY'
                 save_info({"state" : state,
