@@ -1,13 +1,10 @@
-from colorama import *
-from indicator import *
-from orders import *
-from alert import *
-import datetime, time
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, CallbackContext
+from colorama import *
+from funciton import *
+from orders import *
 import logging
 import config
-from indicator import *
 import datetime
 import time
 
