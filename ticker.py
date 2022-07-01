@@ -452,5 +452,8 @@ while True:
     info_action = get_save_info('action.json')
     time.sleep(5)
     if info_action['run'] == 'on':
-        main()
+        try:
+           main()
+        except Exception as e:
+           telegram_bot(f"El bot se eetuvo por {e}")
         print('Bot off')
