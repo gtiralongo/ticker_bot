@@ -1,6 +1,7 @@
 from  colorama import Fore, Back, Style, init
 from binance.client import Client
 import pandas as pd
+import datetime
 import requests
 import smtplib
 import config
