@@ -26,12 +26,13 @@ def start(update, context):
     quick_buy = "/quick buy"
     quick_sell = "/quick sell"
     info = "/infobot" 
-    keyboard_run = [KeyboardButton(runOff), KeyboardButton(runOn)]
+    keyboard_run = [KeyboardButton(runOff), KeyboardButton(runOn),KeyboardButton(info)]
     keyboard_quick = [KeyboardButton(quick_buy), KeyboardButton(quick_sell)]
     # keyboard_CompraVenta = [KeyboardButton('/compra'),KeyboardButton('/venta')]
-    keyboard_resumen = [KeyboardButton(resumen),KeyboardButton(info)]
+    keyboard_resumen = [KeyboardButton(resumen)]
     keyboard_porcent = [KeyboardButton('/p 3.0'),KeyboardButton('/p 5.0'),KeyboardButton('/p 7.0'),KeyboardButton('/p 9.0'),KeyboardButton('/p 15.0')]
-    buttons = [keyboard_resumen, keyboard_run, keyboard_quick,keyboard_porcent]
+    buttons = [keyboard_resumen, keyboard_quick, keyboard_run, keyboard_porcent]
+    
     
     context.bot.send_message(
         chat_id=update.effective_chat.id,
