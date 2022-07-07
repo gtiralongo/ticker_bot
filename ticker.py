@@ -25,11 +25,13 @@ def start(update, context):
     resumen = "/resumen"
     quick_buy = "/quick buy"
     quick_sell = "/quick sell"
-    info = "/infobot"  
+    info = "/infobot" 
     keyboard_run = [KeyboardButton(runOff), KeyboardButton(runOn)]
     keyboard_quick = [KeyboardButton(quick_buy), KeyboardButton(quick_sell)]
+    # keyboard_CompraVenta = [KeyboardButton('/compra'),KeyboardButton('/venta')]
     keyboard_resumen = [KeyboardButton(resumen),KeyboardButton(info)]
-    buttons = [keyboard_resumen, keyboard_run, keyboard_quick]
+    keyboard_porcent = [KeyboardButton('/p 3.0'),KeyboardButton('/p 5.0'),KeyboardButton('/p 7.0'),KeyboardButton('/p 9.0'),KeyboardButton('/p 15.0')]
+    buttons = [keyboard_resumen, keyboard_run, keyboard_quick,keyboard_porcent]
     
     context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -129,6 +131,35 @@ def quick (update, context):
 
 handeler_quick = CommandHandler('quick', quick)
 
+def porcent (update, context):
+    full_name = getattr(update.message.from_user, "full_name", "")
+    chat_id = update.effective_chat.id
+    logger.info(f"{full_name} inicio al bot trader. ID: {chat_id}")
+    if update.effective_chat.id in user_id:
+        data = ' '.join(context.args)
+        data = data.lower()
+        sep_data = data.split(' ')
+        save_info({"porcent_up":float(sep_data[0])},'action.json')
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            disable_web_page_preview=False,
+            protect_content=True,
+            text=f"{full_name}, el % fue cambiado a {sep_data[0]}% 🤖",
+            parse_mode='Markdown'
+        )
+
+
+    else:
+        logger.info(f"Pero no tiene acceso. ID: {chat_id}")
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            disable_web_page_preview=False,
+            protect_content=True,
+            text=f"{full_name}, no tiene acceso a esta función ⛔, solicitar al administrador 📲"
+        )
+
+handeler_porcent = CommandHandler('p', porcent)
+
 def static_bot(update, context):
     full_name = getattr(update.message.from_user, "full_name", "")
     chat_id = update.effective_chat.id
@@ -136,18 +167,30 @@ def static_bot(update, context):
     if update.effective_chat.id in user_id:
         data = ' '.join(context.args)
         sep_data = data.split(' ')
-        if sep_data[6] == 'false':
+        if sep_data[5] == 'false':
             bug = False
-        elif sep_data[6] == 'true':
+        elif sep_data[5] == 'true':
             bug = True
+        if sep_data[1].upper() == 'BUY':
+            quantityBuy = float(sep_data[3])
+            quantitySell = '0.0'
+            venta = float(sep_data[4])
+            compra = '0.0'
+        if sep_data[1].upper() == 'SELL':
+            quantityBuy = '0.0'
+            quantitySell = float(sep_data[3])
+            compra = float(sep_data[4])
+            venta = '0.0'
+
         save_info( {"symbolTicker" : sep_data[0].upper(),
         "state" : sep_data[1].upper(),
         "graf_temp" : sep_data[2].lower(),
-        "quantity" : {"quantityBuy": float(sep_data[3]) ,"quantitySell": float(sep_data[4])},
-        "valor_compra" : float(sep_data[5]),
+        "quantity" : {"quantityBuy": quantityBuy ,"quantitySell": quantitySell},
+        "valor_compra" : compra,
+        "valor_venta" : venta,
         "bug" : bug,
-        "stop" : sep_data[7].lower(),
-        "porcent_up": float(sep_data[8])},'action.json')
+        "stop" : sep_data[6].lower(),
+        "porcent_up": float(sep_data[7])},'action.json')
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             disable_web_page_preview=False,
@@ -216,6 +259,63 @@ def resumen(update, context):
 
 handeler_resumen = CommandHandler('resumen', resumen)
 
+def order(update, context):
+    full_name = getattr(update.message.from_user, "full_name", "")
+    chat_id = update.effective_chat.id
+    logger.info(f"{full_name} pidio las ordenes. ID: {chat_id}")
+    if update.effective_chat.id in user_id:
+        data = ' '.join(context.args)
+        sep_data = data.split(' ')
+        all_ord = False
+        logger.info(f"Del par {sep_data[0].upper()}")
+        if len(sep_data) == 1:
+            orders = all_order(sep_data[0].upper())
+        elif len(sep_data) == 2 and (sep_data[1].upper() =="FILLED" or sep_data[1].upper() =="CANCEL" or sep_data[1].upper() =="NEW"):
+            orders = all_order(sep_data[0].upper(),sep_data[1].upper())
+        elif len(sep_data) == 2 and sep_data[1].upper() == "ALL":
+            orders = all_order(sep_data[0])
+            all_ord = True
+        elif len(sep_data) == 3 and sep_data[2].upper() == "ALL":
+            orders = all_order(sep_data[0],sep_data[1])
+            all_ord = True
+        if all_ord:
+            for o in  orders:
+                if orders[o]["status"] == "FILLED":
+                    msg = f'🆔orderId: {orders[o]["orderId"]}\n💲price: {orders[o]["price"]} \n💵origQty: {orders[o]["origQty"]} \n💰executedQty: {orders[o]["executedQty"]} \n✅status: {orders[o]["status"]} \n🔣type: {orders[o]["type"]}\n🧾side: {orders[o]["side"]}\n⏳time: {orders[o]["time"]}'
+                else:
+                    msg = f'🆔orderId: {orders[o]["orderId"]}\n💲price: {orders[o]["price"]} \n💵origQty: {orders[o]["origQty"]} \n💰executedQty: {orders[o]["executedQty"]} \n❌status: {orders[o]["status"]} \n🔣type: {orders[o]["type"]}\n🧾side: {orders[o]["side"]}\n⏳time: {orders[o]["time"]}'
+
+                context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                disable_web_page_preview=False,
+                protect_content=True,
+                text=msg,
+            )
+        else:
+            total_ord = len(orders)
+            if orders[total_ord]["status"] == "FILLED":
+                msg = f'🆔orderId: {orders[total_ord]["orderId"]}\n💲price: {orders[total_ord]["price"]} \n💵origQty: {orders[total_ord]["origQty"]} \n💰executedQty: {orders[total_ord]["executedQty"]} \n✅status: {orders[total_ord]["status"]} \n🔣type: {orders[total_ord]["type"]}\n🧾side: {orders[total_ord]["side"]}\n⏳time: {orders[total_ord]["time"]}'
+            else:
+                msg = f'🆔orderId: {orders[total_ord]["orderId"]}\n💲price: {orders[total_ord]["price"]} \n💵origQty: {orders[total_ord]["origQty"]} \n💰executedQty: {orders[total_ord]["executedQty"]} \n❌status: {orders[total_ord]["status"]} \n🔣type: {orders[total_ord]["type"]}\n🧾side: {orders[total_ord]["side"]}\n⏳time: {orders[total_ord]["time"]}'
+
+            context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                disable_web_page_preview=False,
+                protect_content=True,
+                text=msg,
+            )
+        
+    else:
+        logger.info(f"Pero no tiene acceso. ID: {chat_id}")
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            disable_web_page_preview=False,
+            protect_content=True,
+            text=f"{full_name}, no tiene acceso a esta función ⛔, solicitar al administrador 📲"
+        )
+
+handeler_order = CommandHandler('order', order)
+
 if __name__ == "__main__":
 
     updater = Updater(token=config.BOT_TOKEN)
@@ -223,9 +323,11 @@ if __name__ == "__main__":
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(handeler_run)
     dispatcher.add_handler(handeler_quick)
+    dispatcher.add_handler(handeler_porcent)
     dispatcher.add_handler(handeler_static_bot)
     dispatcher.add_handler(handeler_info_static_bot)
     dispatcher.add_handler(handeler_resumen)
+    dispatcher.add_handler(handeler_order)
     updater.start_polling(timeout=500)
 
 def main():
@@ -235,6 +337,7 @@ def main():
     graf_temp = info_action['graf_temp']
     quantity = info_action['quantity']
     valor_compra =  info_action['valor_compra']
+    valor_venta = info_action['valor_venta']
     porcent_up = info_action['porcent_up']
     TIMER = [10,14,18,22]
     FLAG_H = 0
@@ -257,9 +360,11 @@ def main():
         graf_temp = info_action['graf_temp']
         quantity = info_action['quantity']
         valor_compra =  info_action['valor_compra']
+        valor_venta = info_action['valor_venta']
         porcent_up = info_action['porcent_up']
         porcent_gan = porcent_up
         quick = info_action['quick_order']
+
         save_info({"time":datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")},'action.json')
         print("---------------------------------------")
         print(f'Estado: {Color.AZUL}{state}{Color.RESET}  Grafico: {Color.AZUL}{graf_temp}{Color.RESET}')
@@ -296,7 +401,10 @@ def main():
                     time.sleep(2)
                     trend = get_trend(symbolTicker,graf_temp)['trend']
                     print(f'Trend de {symbolTicker} estado {state}, error corrigiendo  ')
-                resumen = (f'🪙Precio {symbolTicker[:-3]}: *${indicator["close"]}* \n💵{symbolTicker[-3:]}: *{quantity["quantityBuy"]}* \n⚙ Estado: {state}  🕘Grafico: {graf_temp}  \n💹Tendencia: {trend}\n⏳{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')  
+                if valor_venta != '0':
+                    resumen = (f'🪙Precio {symbolTicker[:-3]}: *${indicator["close"]}* \n💵{symbolTicker[-3:]}: *{quantity["quantityBuy"]}* \n🧾Valor de Venta: {valor_venta} --> {round(((indicator["close"]-valor_venta)*100)/valor_venta,2)}%\n⚙ Estado: {state}  🕘Grafico: {graf_temp}  \n💹Tendencia: {trend}\n⏳{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')  
+                else:
+                    resumen = (f'🪙Precio {symbolTicker[:-3]}: *${indicator["close"]}* \n💵{symbolTicker[-3:]}: *{quantity["quantityBuy"]}* \n⚙ Estado: {state}  🕘Grafico: {graf_temp}  \n💹Tendencia: {trend}\n⏳{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')  
                 telegram_bot(resumen)
                 save_info({"resumen":"off"},'action.json')
             if quick == "buy":
@@ -314,7 +422,8 @@ def main():
                             "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity["quantitySell"]},
                             "resumen" : "on",
                             "quick_order":"off",
-                            "valor_compra" : valor_compra},'action.json')
+                            "valor_compra" : valor_compra,
+                            "valor_venta" :0.0 },'action.json')
                 telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
                 save_info(order_buy,"ordenes.json")
                 save_info({"quick_order":"off"},'action.json')
@@ -338,14 +447,23 @@ def main():
                                 save_info({"state" : state,
                                             "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity["quantitySell"]},
                                             "resumen" : "on",
-                                            "valor_compra" : valor_compra,},'action.json')
+                                            "valor_compra" : valor_compra,
+                                            "valor_venta" :0.0 },'action.json')
                                 telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
 
                                 save_info(order_buy, "ordenes.json")
-                elif indicator["EMA20"] >= indicator["close"] and indicator["EMA50"] <= indicator["close"] and indicator["EMA10"] >= indicator["EMA20"]:                
+
+#   -----------------------------------------                   
+#               CAMBIO DATOS DE COMPRA
+#------------------------------------------------
+                elif indicator["EMA10"] >= indicator["close"] and indicator["EMA50"] <= indicator["close"] and indicator["EMA10"] <= indicator["EMA20"]:                
                     if indicator["MACD.macd"]-indicator["MACD.signal"] < 0 and indicator["MACD.macd"] < indicator["MACD.signal"]:
                         if indicator["RSI"]> 40 and indicator["RSI"] < 55:
                             if indicator["ADX"] >= 40:
+                # elif indicator["EMA20"] >= indicator["close"] and indicator["EMA50"] <= indicator["close"] and indicator["EMA10"] >= indicator["EMA20"]:                
+                #     if indicator["MACD.macd"]-indicator["MACD.signal"] < 0 and indicator["MACD.macd"] < indicator["MACD.signal"]:
+                #         if indicator["RSI"]> 40 and indicator["RSI"] < 55:
+                #             if indicator["ADX"] >= 40:
                                 try:
                                     order_buy = dinamic_order_buy(symbolTicker,quantity,stop_buy) #--- Orden de compra
                                 except Exception as e:
@@ -359,7 +477,8 @@ def main():
                                 save_info({"state" : state,
                                             "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity["quantitySell"]},
                                             "resumen" : "on",
-                                            "valor_compra" : valor_compra,},'action.json')
+                                            "valor_compra" : valor_compra,
+                                            "valor_venta" :0.0 },'action.json')
                                 telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
 
                                 save_info(order_buy,"ordenes.json")
@@ -385,7 +504,8 @@ def main():
                             "quantity" : {"quantityBuy": quantity["quantityBuy"] ,"quantitySell": 0.0},
                             "resumen" : "on",
                             "quick_order":"off",
-                            "valor_compra" : 0.0,},'action.json')
+                            "valor_compra" : 0.0,
+                            "valor_venta" : float(order_sell["price"])},'action.json')
             try:
                 price = float(lastprice(symbolTicker))
             except Exception as e:
@@ -425,7 +545,8 @@ def main():
                 save_info({"state" : state,
                             "quantity" : {"quantityBuy": quantity["quantityBuy"] ,"quantitySell": 0.0},
                             "resumen" : "on",
-                            "valor_compra" : 0.0,},'action.json')
+                            "valor_compra" : 0.0,
+                            "valor_venta" : float(order_sell["price"])},'action.json')
                 telegram_bot(f'🚀Vendimos \n😎{order_sell["symbolTicker"][:-3]} 💪*{round(((float(order_sell["price"])-valor_compra)*100)/valor_compra,2)}%*\n🔢Order ID : {order_sell["order_id"]}\n📉Operacion: {order_sell["side"]}\n🪙{order_sell["symbolTicker"][:-3]}: {order_sell["quantity"]}\n💵{order_sell["symbolTicker"][-3:]} : {float(order_sell["total"])}\n📊Precio: {order_sell["price"]}')
                 save_info(order_sell,'ordenes.json')
 
@@ -442,7 +563,10 @@ def main():
                 if state == 'SELL':
                     resumen = (f'🪙{symbolTicker[:-3]}: *{quantity["quantitySell"]}*\n⚙ Estado: {state}  🕘Grafico: {graf_temp}  \n💹Tendencia: {trend}\n🧾Valor de compra: _${valor_compra}_\n💲Precio actual: ${price} Porcentaje: *{porcent}%*\n💰Profit: _{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}_  Profit %: _{round(porcent_gan,2)}%_\n⏳{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
                 elif state == 'BUY':
-                    resumen = (f'🪙Precio {symbolTicker[:-3]}: *${indicator["close"]}* \n💵{symbolTicker[-3:]}: *{quantity["quantityBuy"]}* \n⚙ Estado: {state}  🕘Grafico: {graf_temp}  \n💹Tendencia: {trend}\n⏳{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')  
+                    if valor_venta != '0':
+                        resumen = (f'🪙Precio {symbolTicker[:-3]}: *${indicator["close"]}* \n💵{symbolTicker[-3:]}: *{quantity["quantityBuy"]}* \n🧾Valor de Venta: {valor_venta} --> {round(((indicator["close"]-valor_venta)*100)/valor_venta,2)}%\n⚙ Estado: {state}  🕘Grafico: {graf_temp}  \n💹Tendencia: {trend}\n⏳{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')  
+                    else:
+                        resumen = (f'🪙Precio {symbolTicker[:-3]}: *${indicator["close"]}* \n💵{symbolTicker[-3:]}: *{quantity["quantityBuy"]}* \n⚙ Estado: {state}  🕘Grafico: {graf_temp}  \n💹Tendencia: {trend}\n⏳{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')  
                 telegram_bot(resumen)
                 FLAG_H = i           
         time.sleep(5)
