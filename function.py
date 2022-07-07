@@ -370,3 +370,14 @@ def telegram_bot(bot_message):
     response = requests.get(send_text)
 
     return response.json()
+
+def all_order(ticker,status="FILLED"):
+    order = client.get_all_orders(symbol=ticker)
+    orders={}
+    num = 1
+    for o in order:
+        if o["status"] == status:
+            time = datetime.datetime.fromtimestamp( o["time"]/1000).strftime('%Y-%m-%d %H:%M:%S')
+            orders.update({num:{"symbol": o["symbol"],"price": o["price"],"origQty": o["origQty"],"executedQty": o["executedQty"], "status": o["status"],"type": o["type"],"side": o["side"],"orderId": o["orderId"],"time": time}})
+            num += 1
+    return orders
