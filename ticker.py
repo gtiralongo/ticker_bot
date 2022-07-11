@@ -220,7 +220,7 @@ def state_static_bot(update, context):
             chat_id=update.effective_chat.id,
             disable_web_page_preview=False,
             protect_content=True,
-            text=f"Run: {info_static['run']}\nSymbol: {info_static['symbolTicker']}\nEstado:{info_static['state']}\nGrafico: {info_static['graf_temp']}\nStable-Coin:{info_static['quantity']}\nValor Compra: {info_static['valor_compra']}\nBug: {info_static['bug']}\nTime: {info_static['time']}\nStop: {info_static['stop']}\nPorcent_up: {info_static['porcent_up']}\nQuick: {info_static['quick_order']}\n",
+            text=f"Run: {info_static['run']}\nSymbol: {info_static['symbolTicker']}\nEstado:{info_static['state']}\nGrafico: {info_static['graf_temp']}\nStable-Coin:{info_static['quantity']}\nValor Compra: {info_static['valor_compra']}\nValor Venta: {info_static['valor_venta']}\nBug: {info_static['bug']}\nTime: {info_static['time']}\nStop: {info_static['stop']}\nPorcent_up: {info_static['porcent_up']}\nQuick: {info_static['quick_order']}\n",
         )
 
 
