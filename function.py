@@ -382,3 +382,25 @@ def all_order(ticker,status="FILLED"):
             orders.update({num:{"symbol": o["symbol"],"price": o["price"],"origQty": o["origQty"],"executedQty": o["executedQty"], "status": o["status"],"type": o["type"],"side": o["side"],"orderId": o["orderId"],"time": time}})
             num += 1
     return orders
+
+def p2p():
+    response = requests.get(url="https://criptoya.com/api/binancep2p/usdt")
+    if response.status_code != 200:
+        raise Exception(f"Algo salio mal. Code {response.status_code}.")
+    result = json.loads(response.text)
+
+    trades = {}
+    for r in result["asks"]["data"]:
+        if r["adv"]["tradeType"] == "SELL": 
+            for m in r["adv"]["tradeMethods"]:
+                if m["tradeMethodName"] == "Mercadopago" or m["tradeMethodName"] == "Lemon Cash":
+                    trades.update({r["advertiser"]["nickName"]:{
+                    "precio":r["adv"]["price"],
+                    "total":r["adv"]["initAmount"],
+                    "min":r["adv"]["minSingleTransAmount"],
+                    "max":r["adv"]["maxSingleTransAmount"],
+                    "trade": r["advertiser"]["monthOrderCount"],
+                    "finish": r["advertiser"]["monthFinishRate"],
+                    "method": m["tradeMethodName"],
+                    }})
+    return trades
