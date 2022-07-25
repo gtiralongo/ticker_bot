@@ -55,6 +55,8 @@ def get_trend(symbolTicker, graf_temp):
         temp = client.get_historical_klines(symbolTicker, Client.KLINE_INTERVAL_5MINUTE, '1 hour ago UTC')
     elif graf_temp == '15m':
         temp = client.get_historical_klines(symbolTicker, Client.KLINE_INTERVAL_15MINUTE, '4 hours ago UTC')
+    elif graf_temp == '1h':
+        temp = client.get_historical_klines(symbolTicker, Client.KLINE_INTERVAL_15MINUTE, '11 hours ago UTC')
     elif graf_temp == '4h':
         temp = client.get_historical_klines(symbolTicker, Client.KLINE_INTERVAL_4HOUR, '4 days ago UTC')
     elif graf_temp == '1d':
