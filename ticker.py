@@ -388,12 +388,12 @@ def main():
                 time.sleep(2)
                 indicator_up = get_indicator_temp(symbolTicker,temp_up)[symbolTicker]
                 print(f'Indicador de {symbolTicker} estado {state}, error corrigiendo  ')
-            try:
-                indicator_1h = get_indicator_temp(symbolTicker,'1h')[symbolTicker]
-            except Exception as e:
-                time.sleep(2)
-                indicator_1h = get_indicator_temp(symbolTicker,'1h')[symbolTicker]
-                print(f'Indicador de {symbolTicker} estado {state}, error corrigiendo  ')
+#             try:
+#                 indicator_1h = get_indicator_temp(symbolTicker,'1h')[symbolTicker]
+#             except Exception as e:
+#                 time.sleep(2)
+#                 indicator_1h = get_indicator_temp(symbolTicker,'1h')[symbolTicker]
+#                 print(f'Indicador de {symbolTicker} estado {state}, error corrigiendo  ')
                 
             if info_action['resumen'] == 'on':
                 try:
@@ -428,32 +428,30 @@ def main():
                 telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
                 save_info(order_buy,"ordenes.json")
                 save_info({"quick_order":"off"},'action.json')
-            if indicator_up['close'] > indicator_up['SMA20']:# and indicator_up['RSI'] >= 50:
-                if indicator['close'] > indicator_1h['EMA50'] and indicator_1h['EMA20'] > indicator_1h['EMA50']:
-                    print(f'{Color.CYAN}Buscando estrategia de compra')
-                    if indicator["EMA50"] >= indicator["EMA20"] and indicator["EMA20"] >= indicator["EMA10"]:
-                        print(f'{Color.AZUL}ESTRATEGIA FULL DOWN{Color.RESET}')
-                        if indicator["SMA5"] <= indicator['close']:
-                            if indicator["MACD.macd"] < 0 and indicator["RSI"] < 45:
-                                try:
-                                    order_buy = dinamic_order_buy(symbolTicker,quantity,stop_buy) #--- Orden de compra
-                                except Exception as e:
-                                    time.sleep(2)
-                                    print(f'Buy order de {symbolTicker} estado {state}, el programa se detuvo Error: _{e}_')
-                                    order_buy = dinamic_order_buy(symbolTicker,quantity,stop_buy) #--- Orden de compra  
-                                quantity["quantitySell"] = float(order_buy["quantity"])
-                                quantity["quantityBuy"] = 0
-                                state = 'SELL'
-                                valor_compra = float(order_buy["price"])
-                                save_info({"state" : state,
-                                            "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity["quantitySell"]},
-                                            "resumen" : "on",
-                                            "valor_compra" : valor_compra,
-                                            "valor_venta" :0.0 },'action.json')
-                                telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
-
-                                save_info(order_buy, "ordenes.json")
-
+            if indicator_up['close'] > indicator_up['SMA5']:# and indicator_up['RSI'] >= 50:
+#                 if indicator['close'] > indicator_1h['EMA50'] and indicator_1h['EMA20'] > indicator_1h['EMA50']:
+                  print(f'{Color.CYAN}Buscando estrategia de compra')
+                  if indicator["EMA50"] >= indicator["EMA20"] and indicator["EMA20"] >= indicator["EMA10"]:
+                    print(f'{Color.AZUL}ESTRATEGIA FULL DOWN{Color.RESET}')
+                    if indicator["SMA5"] <= indicator['close']:
+                        if indicator["MACD.macd"] < 0 and indicator["RSI"] < 45:
+                            try:
+                                order_buy = dinamic_order_buy(symbolTicker,quantity,stop_buy) #--- Orden de compra
+                            except Exception as e:
+                                time.sleep(2)
+                                print(f'Buy order de {symbolTicker} estado {state}, el programa se detuvo Error: _{e}_')
+                                order_buy = dinamic_order_buy(symbolTicker,quantity,stop_buy) #--- Orden de compra  
+                            quantity["quantitySell"] = float(order_buy["quantity"])
+                            quantity["quantityBuy"] = 0
+                            state = 'SELL'
+                            valor_compra = float(order_buy["price"])
+                            save_info({"state" : state,
+                                        "quantity" : {"quantityBuy": 0.0 ,"quantitySell": quantity["quantitySell"]},
+                                        "resumen" : "on",
+                                        "valor_compra" : valor_compra,
+                                        "valor_venta" :0.0 },'action.json')
+                            telegram_bot(f'🌕Orden de compra *{order_buy["symbolTicker"]}*\n📉Operacion: _{order_buy["side"]}_\n📊Precio: *{order_buy["price"]}*\n🪙{order_buy["symbolTicker"][:-4]}: {order_buy["quantity"]}\n💵{symbolTicker[-4:]} : {order_buy["total"]}\n🔢Order ID : {order_buy["order_id"]}\n🪐Profit: *{round(valor_compra+(valor_compra*(porcent_gan/100)),info_price["minPrice"])}*')
+                            save_info(order_buy, "ordenes.json")
 #   -----------------------------------------                   
 #               CAMBIO DATOS DE COMPRA
 #------------------------------------------------
