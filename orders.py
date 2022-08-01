@@ -1,5 +1,4 @@
-from alert import telegram_bot
-from indicator import *
+from functions import *
 from colorama import *
 import time
 
