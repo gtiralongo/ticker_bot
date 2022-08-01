@@ -455,10 +455,10 @@ def main():
 #   -----------------------------------------                   
 #               CAMBIO DATOS DE COMPRA
 #------------------------------------------------
-                elif indicator["EMA10"] >= indicator["close"] and indicator["EMA50"] <= indicator["close"] and indicator["EMA10"] <= indicator["EMA20"]:                
-                    if indicator["MACD.macd"]-indicator["MACD.signal"] < 0 and indicator["MACD.macd"] < indicator["MACD.signal"]:
-                        if indicator["RSI"]> 40 and indicator["RSI"] < 55:
-                            if indicator["ADX"] >= 40:
+             elif indicator["EMA10"] >= indicator["close"] and indicator["EMA50"] <= indicator["close"] and indicator["EMA10"] <= indicator["EMA20"]:                
+                if indicator["MACD.macd"]-indicator["MACD.signal"] < 0 and indicator["MACD.macd"] < indicator["MACD.signal"]:
+                    if indicator["RSI"]> 40 and indicator["RSI"] < 55:
+                        if indicator["ADX"] >= 40:
                 # elif indicator["EMA20"] >= indicator["close"] and indicator["EMA50"] <= indicator["close"] and indicator["EMA10"] >= indicator["EMA20"]:                
                 #     if indicator["MACD.macd"]-indicator["MACD.signal"] < 0 and indicator["MACD.macd"] < indicator["MACD.signal"]:
                 #         if indicator["RSI"]> 40 and indicator["RSI"] < 55:
