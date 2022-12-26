@@ -32,7 +32,7 @@ class Color:
 def symbol_info(symbolTicker):
     info = client.get_symbol_info(symbolTicker)
     minPrice = info["filters"][0]["minPrice"]
-    minQty = info["filters"][2]["minQty"]
+    minQty = info["filters"][1]["minQty"]
     n_minPrice = 0
     n_minQty = 0
     for i in minQty:
